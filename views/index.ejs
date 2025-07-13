@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Message Bot - Teach & Chat</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            max-width: 1000px;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            padding: 40px;
+        }
+
+        .section {
+            margin-bottom: 40px;
+            padding: 30px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            border: 1px solid #e9ecef;
+        }
+
+        .section h2 {
+            color: #495057;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            font-weight: 500;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #495057;
+        }
+
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="text"]:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
+        }
+
+        .chat-container {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+            background: white;
+        }
+
+        .chat-message {
+            margin-bottom: 15px;
+            padding: 12px 15px;
+            border-radius: 8px;
+            max-width: 80%;
+        }
+
+        .chat-message.user {
+            background: #667eea;
+            color: white;
+            margin-left: auto;
+            text-align: right;
+        }
+
+        .chat-message.bot {
+            background: #e9ecef;
+            color: #495057;
+        }
+
+        .chat-input-container {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .chat-input {
+            flex: 1;
+        }
+
+        .footer {
+            background: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .stats {
+            font-size: 1.1em;
+            color: #6c757d;
+            font-weight: 500;
+        }
+
+        .alert {
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+
+        .taught-messages {
+            margin-top: 20px;
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 15px;
+            background: white;
+        }
+
+        .message-pair {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .message-pair:last-child {
+            border-bottom: none;
+        }
+
+        .message-content {
+            flex: 1;
+        }
+
+        .message-input {
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .message-reply {
+            color: #6c757d;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+
+        .delete-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8em;
+        }
+
+        .delete-btn:hover {
+            background: #c82333;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+            }
+
+            .main-content {
+                padding: 20px;
+            }
+
+            .section {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .chat-input-container {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 Message Bot</h1>
+            <p>Teach me new responses and chat with me!</p>
+        </div>
+
+        <div class="main-content">
+            <!-- Teach Section -->
+            <div class="section">
+                <h2>📚 Teach New Response</h2>
+                <div id="teachAlert"></div>
+                <form id="teachForm">
+                    <div class="form-group">
+                        <label for="teachInput">When someone says:</label>
+                        <input type="text" id="teachInput" name="input" placeholder="e.g., Hello, What's your name?, How are you?" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="teachReply">I should reply:</label>
+                        <textarea id="teachReply" name="reply" placeholder="e.g., Hi there! How can I help you today?" required></textarea>
+                    </div>
+                    <button type="submit" class="btn">Teach Me</button>
+                </form>
+
+                <div class="taught-messages" id="taughtMessages">
+                    <h3>Currently Taught Messages:</h3>
+                    <div id="messagesList"></div>
+                </div>
+            </div>
+
+            <!-- Delete Section -->
+            <div class="section">
+                <h2>🗑️ Delete Response</h2>
+                <div id="deleteAlert"></div>
+                <form id="deleteForm">
+                    <div class="form-group">
+                        <label for="deleteInput">Delete response for:</label>
+                        <input type="text" id="deleteInput" name="input" placeholder="Enter the exact input text to delete" required>
+                    </div>
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+            </div>
+
+            <!-- Chat Section -->
+            <div class="section">
+                <h2>💬 Chat with Me</h2>
+                <div class="chat-container" id="chatContainer">
+                    <div class="chat-message bot">
+                        <strong>Bot:</strong> Hello! I'm ready to chat. You can teach me new responses above!
+                    </div>
+                </div>
+                <div class="chat-input-container">
+                    <input type="text" id="chatInput" class="chat-input" placeholder="Type your message here..." onkeypress="handleChatKeyPress(event)">
+                    <button onclick="sendMessage()" class="btn">Send</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <div class="stats">
+                📊 Total taught messages: <span id="totalCount"><%= totalCount %></span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Load taught messages on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadTaughtMessages();
+        });
+
+        // Teach form submission
+        document.getElementById('teachForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const input = document.getElementById('teachInput').value;
+            const reply = document.getElementById('teachReply').value;
+            
+            try {
+                const response = await fetch('/api/teach', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ input, reply })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showAlert('teachAlert', 'Success! I learned that "' + input + '" should get the reply: "' + reply + '"', 'success');
+                    document.getElementById('teachForm').reset();
+                    loadTaughtMessages();
+                    updateStats();
+                } else {
+                    showAlert('teachAlert', 'Error: ' + data.error, 'error');
+                }
+            } catch (error) {
+                showAlert('teachAlert', 'Error: ' + error.message, 'error');
+            }
+        });
+
+        // Delete form submission
+        document.getElementById('deleteForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const input = document.getElementById('deleteInput').value;
+            
+            try {
+                const response = await fetch('/api/delete', {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ input })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showAlert('deleteAlert', 'Successfully deleted response for "' + input + '"', 'success');
+                    document.getElementById('deleteForm').reset();
+                    loadTaughtMessages();
+                    updateStats();
+                } else {
+                    showAlert('deleteAlert', 'Error: ' + data.error, 'error');
+                }
+            } catch (error) {
+                showAlert('deleteAlert', 'Error: ' + error.message, 'error');
+            }
+        });
+
+        // Chat functionality
+        function handleChatKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            
+            if (!message) return;
+            
+            // Add user message to chat
+            addMessageToChat(message, 'user');
+            input.value = '';
+            
+            try {
+                const response = await fetch('/api/message?text=' + encodeURIComponent(message));
+                const data = await response.json();
+                
+                if (data.success) {
+                    addMessageToChat(data.reply, 'bot');
+                } else {
+                    addMessageToChat('Sorry, I encountered an error.', 'bot');
+                }
+            } catch (error) {
+                addMessageToChat('Sorry, I encountered an error.', 'bot');
+            }
+        }
+
+        function addMessageToChat(message, sender) {
+            const chatContainer = document.getElementById('chatContainer');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `chat-message ${sender}`;
+            messageDiv.innerHTML = `<strong>${sender === 'user' ? 'You' : 'Bot'}:</strong> ${message}`;
+            chatContainer.appendChild(messageDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        // Load and display taught messages
+        async function loadTaughtMessages() {
+            try {
+                const response = await fetch('/api/all');
+                const data = await response.json();
+                
+                if (data.success) {
+                    const messagesList = document.getElementById('messagesList');
+                    messagesList.innerHTML = '';
+                    
+                    if (data.messages.length === 0) {
+                        messagesList.innerHTML = '<p style="color: #6c757d; text-align: center;">No messages taught yet.</p>';
+                        return;
+                    }
+                    
+                    data.messages.forEach(msg => {
+                        const messageDiv = document.createElement('div');
+                        messageDiv.className = 'message-pair';
+                        messageDiv.innerHTML = `
+                            <div class="message-content">
+                                <div class="message-input">"${msg.input}"</div>
+                                <div class="message-reply">→ "${msg.reply}"</div>
+                            </div>
+                            <button class="delete-btn" onclick="deleteMessage('${msg.input}')">Delete</button>
+                        `;
+                        messagesList.appendChild(messageDiv);
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading taught messages:', error);
+            }
+        }
+
+        // Delete message from the list
+        async function deleteMessage(input) {
+            try {
+                const response = await fetch('/api/delete', {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ input })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    loadTaughtMessages();
+                    updateStats();
+                }
+            } catch (error) {
+                console.error('Error deleting message:', error);
+            }
+        }
+
+        // Update stats
+        async function updateStats() {
+            try {
+                const response = await fetch('/api/stats');
+                const data = await response.json();
+                
+                if (data.success) {
+                    document.getElementById('totalCount').textContent = data.totalMessages;
+                }
+            } catch (error) {
+                console.error('Error updating stats:', error);
+            }
+        }
+
+        // Show alert message
+        function showAlert(containerId, message, type) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
+            
+            setTimeout(() => {
+                container.innerHTML = '';
+            }, 5000);
+        }
+    </script>
+</body>
+</html>
